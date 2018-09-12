@@ -1,0 +1,142 @@
+/*
+Theme Name: RPCBlank
+Theme URI: 
+Author: Radiant Punch
+Author URI: https://radiantpunch.com
+Description: Base theme for Radiant Punch client websites
+Version: 0.1.0
+License: GNU General Public License
+License URI: https://www.gnu.org/licenses/gpl.html
+Text Domain: rpcblank;
+*/
+
+/* ========== NORMALIZE ========== */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block
+}
+
+blockquote, body, dl, dd, h1, h2, h3, h4, h5, h6, hr, p, ul {
+    margin: 0;
+}
+
+input, ul, option, select, textarea {
+    padding: 0;
+}
+
+iframe, input, select, textarea {
+    border: none;
+}
+
+input, select {
+    font-family: inherit;
+}
+
+h1, h2, h3, h4, h5, h6, input, select {
+    font-size: inherit;    
+}
+
+h1, h2, h3, h4, h5, h6, strong {
+    font-weight: inherit;
+}
+
+dfn, em {
+    font-style: normal;
+}
+
+body {
+    line-height: 1;
+}
+
+a, select, input::placeholder {
+    color: inherit;
+}
+
+a, abbr[title] {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+input, mark, select {
+    background-color: transparent;
+}
+
+a:focus, input:focus, select:focus, summary:focus, textarea:focus {
+    outline: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: none;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+iframe, select, textarea {
+    width: 100%;
+}
+
+option {
+    min-height: unset;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+/* ========== ACCESSIBILITY ========== */
+
+.screen-reader-text {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+}
+
+/* ========== BASIC TYPOGRAPHY ========== */
+
+/* ========== MEDIA ========== */
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.sticky {}
+
+.bypostauthor {}
+
+.wp-caption {}
+
+.wp-caption-text {}
+
+.gallery-caption {}
+
+.alignright {}
+
+.alignleft {}
+
+.aligncenter {}
+
+/* ========== MISCELLANEOUS ========== */
+
+.gtag {
+    height: 0;
+    width: 0;
+    display: none;
+    visibility: hidden;
+}
