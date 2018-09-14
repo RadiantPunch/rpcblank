@@ -1,6 +1,11 @@
 <?php 
 
 function rpcblank_cta() {
+
+	if ( !function_exists( 'get_field' ) ) {
+		return;
+	}
+
 	if ( get_field( 'cta_enable' ) === 'enable' ) {
 		$prefix = '';
 		$class = sanitize_html_class( get_field( $prefix . 'background' ) );
