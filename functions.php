@@ -387,9 +387,9 @@ function rpcblank_highlight_search_term( $data ) {
 /* ----- Emoji ----- */
 
 // Disable all emoji support
-add_action( 'init', 'rpcblank_disable_wp_emoji' );
+add_action( 'init', 'rpcblank_remove_wp_emoji' );
 
-function rpcblank_disable_wp_emoji() {
+function rpcblank_remove_wp_emoji() {
 
     // Remove all actions related to emojis
     remove_action( 'admin_print_styles', 'print_emoji_styles' );
@@ -401,7 +401,7 @@ function rpcblank_disable_wp_emoji() {
     remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
 
     // Remove TinyMCE emoji support
-    add_filter( 'tiny_mce_plugins', 'rpcblank_disable_tinymce_emoji' );
+    add_filter( 'tiny_mce_plugins', 'rpcblank_remove_tinymce_emoji' );
 
     // Remove emoji DNS prefetch
     add_filter( 'emoji_svg_url', '__return_false' );
@@ -409,13 +409,22 @@ function rpcblank_disable_wp_emoji() {
 }
 
 // Remove TinyMCE emoji support
-function rpcblank_disable_tinymce_emoji( $plugins ) {
+function rpcblank_remove_tinymce_emoji( $plugins ) {
     if ( is_array( $plugins ) ) {
         return array_diff( $plugins, array( 'wpemoji' ) );
     } else {
         return array();
     }
 }
+
+/* ----- Media Element ----- */
+
+// Remove default CSS and JavaScript WordPress adds to audio shortcode
+function rpcblank_remove_media_element_scripts() {
+    return '';
+}
+
+add_filter('wp_audio_shortcode_library', 'rpcblank_remove_media_element_scripts');
 
 /* ----- Recent Comments CSS ----- */
 
