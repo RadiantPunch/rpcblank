@@ -1,3 +1,5 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
+
 <footer class="entry-footer">
 	<span class="cat-links"><?php _e( 'Categories: ', 'rpcblank' ); ?><?php the_category( ', ' ); ?></span>
 	<?php if ( has_tag() ) : ?><span class="tag-links"><?php _e( 'Tags: ', 'rpcblank' ); ?><?php the_tags(); ?></span><?php endif; ?>

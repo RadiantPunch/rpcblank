@@ -1,3 +1,5 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
+
 	</main>
 	<!-- End Site Main -->
 	<footer class="site-footer">

@@ -1,4 +1,6 @@
-<?php get_header(); ?>
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+get_header(); ?>
 <?php global $post; ?>
 <!-- Main Attachment Content -->
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'main-content' ); ?>>
@@ -7,7 +9,7 @@
 	<?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
 	<header class="main-header">
 		<h1 class="main-title">
-			<?php the_title(); ?> <span class="meta-sep">&bull;</span> <a href="<?php echo get_permalink( $post->post_parent ); ?>" title="<?php printf( __( 'Return to %s', 'rpcblank' ), esc_html( get_the_title( $post->post_parent ), 1 ) ); ?>" rev="attachment"><span class="meta-nav">&larr; </span><?php echo get_the_title( $post->post_parent ); ?></a> ?>
+			<?php the_title(); ?> <span class="meta-sep">&bull;</span> <a href="<?php echo get_permalink( $post->post_parent ); ?>" title="<?php printf( __( 'Return to %s', 'rpcblank' ), esc_html( get_the_title( $post->post_parent ), 1 ) ); ?>" rev="attachment"><span class="meta-nav">&larr; </span><?php echo get_the_title( $post->post_parent ); ?></a>
 		</h1>
 		<?php get_template_part( 'template-parts/post/post', 'meta' ); ?>
 		<nav class="attachment-nav">
@@ -27,6 +29,7 @@
 		<div class="entry-caption"><?php if ( !empty( $post->post_excerpt ) ) the_excerpt(); ?></div>
 		<?php if ( has_post_thumbnail() ) { the_post_thumbnail(); } ?>
 	</div>
+	<?php endwhile; endif; ?>
 	<!-- End Attachment Content -->
 
 </article>

@@ -1,4 +1,6 @@
-<?php get_header(); ?>
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+get_header(); ?>
 <!-- Main Blog Content -->
 <section class="main-content">
 

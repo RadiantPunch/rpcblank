@@ -1,4 +1,6 @@
-<?php if ( 'comments.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) return; ?>
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+if ( 'comments.php' == basename( $_SERVER['SCRIPT_FILENAME'] ) ) return; ?>
 <div class="comments">
 	<?php if ( have_comments() ) :
 		global $comments_by_type;

@@ -1,4 +1,6 @@
-<?php get_header(); ?>
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+get_header(); ?>
 <!-- Main Post Content -->
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'main-content' ); ?>>
 
