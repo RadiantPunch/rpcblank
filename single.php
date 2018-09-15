@@ -13,6 +13,7 @@ get_header(); ?>
 		</div>
 		<?php endif; ?>
 		<h1 class="main-title entry-title"><?php the_title(); ?></h1>
+		<?php get_template_part( 'template-parts/post/post', 'sharing' ); ?>
 		<?php get_template_part( 'template-parts/post/post', 'meta' ); ?>
 	<?php endwhile; endif; ?>	
 	</header>
