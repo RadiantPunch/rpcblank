@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /* ========== THEME SETUP ========== */
 
@@ -452,11 +452,17 @@ function rpcblank_remove_tinymce_emoji( $plugins ) {
 /* ----- Media Element ----- */
 
 // Remove default CSS and JavaScript WordPress adds to audio shortcode
-function rpcblank_remove_media_element_scripts() {
-    return '';
+add_action( 'wp_print_scripts', 'no_mediaelement_scripts', 100 );
+add_filter('wp_video_shortcode_library','no_mediaelement');
+
+function no_mediaelement_scripts() {
+    wp_dequeue_script( 'wp-mediaelement' );
+    wp_deregister_script( 'wp-mediaelement' );
 }
 
-add_filter('wp_audio_shortcode_library', 'rpcblank_remove_media_element_scripts');
+function no_mediaelement() {
+    return '';
+}
 
 /* ----- Recent Comments CSS ----- */
 
