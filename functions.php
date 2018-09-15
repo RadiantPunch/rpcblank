@@ -314,15 +314,57 @@ function rpc_blank_remove_post_classes( $classes, $extra_classes ) {
     return array_merge( $classes, (array) $extra_classes );
 }
 
-/* ----- Post formats ----- */
+/* ----- Post Excerpts ----- */
 
-// Decide whether to show the full text or summary in blog listing pages based on post format
-function rpcblank_full_content_post_format() {
-    if ( has_post_format( 'gallery' ) || has_post_format( 'image' ) || has_post_format( 'video' ) || has_post_format( 'audio' ) || has_post_format( 'link' ) ){
-        return true;
-    } else {
-        return false;
+// Allow HTML in excerpts
+remove_filter( 'get_the_excerpt', 'wp_trim_excerpt' );
+add_filter( 'get_the_excerpt', 'rpcblank_html_excerpt' );
+
+function rpcblank_html_excerpt( $rpcblank_excerpt ) {
+    $allowed = '<a>,<abbr>,<address>,<audio>,<bdi>,<bdo>,<blockquote>,<br>,<caption>,<cite>,<code>,<col>,<colgroup>,<dd>,<del>,<details>,<dfn>,<div>,<dl>,<dt>,<em>,<embed>,<figcaption>,<figure>,<footer>,<h3>,<h4>,<h5>,<h6>,<hr>,<iframe>,<img>,<ins>,<kbd>,<li>,<mark>,<meter>,<object>,<ol>,<p>,<pre>,<progress>,<q>,<rp>,<rt>,<ruby>,<samp>,<script>,<span>,<strong>,<summary>,<table>,<tbody>,<td>,<tfoot>,<th>,<thead>,<time>,<tr>,<track>,<ul>,<var>,<video>,<wbr>';
+    $raw_excerpt = $rpcblank_excerpt;
+    $include_read_more = true;
+    
+    if ( '' == $rpcblank_excerpt ) {
+        
+        $rpcblank_excerpt = apply_filters( 'the_content', get_the_content( '' ) );
+        $rpcblank_excerpt = str_replace( ']]>', ']]&gt;', $rpcblank_excerpt );
+        $rpcblank_excerpt = strip_tags( $rpcblank_excerpt, $allowed );
+
+        // Set the excerpt word limit and only break after a sentence is complete
+        $word_count = 60;
+        $excerpt_length = apply_filters( 'excerpt_length', $word_count ); 
+        $tokens = array();
+        $excerpt_output = '';
+        $count = 0;
+
+        // Divide the string into tokens; HTML tags, or words, followed by any whitespace
+        preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $rpcblank_excerpt, $tokens);
+        foreach ( $tokens[0] as $token ) { 
+            if ( $count >= $excerpt_length && preg_match( '/[\;\?\.\!]\s*/uS', $token ) ) { 
+                // Limit reached, continue until , ; ? . or ! occur at the end
+                $excerpt_output .= trim( $token );
+                break;
+            }
+            if ( !preg_match( '/(<[^>]+>)/uS', $token  ) ) {
+                // Add words to complete sentence
+                $count++;
+            }
+            // Append what's left of the token
+            $excerpt_output .= $token;
+        }
+
+        $rpcblank_excerpt = trim( force_balance_tags( $excerpt_output ) );
+        if ( $count <= $word_count ) {
+            $include_read_more = false;
+        }
     }
+    if ( $include_read_more ) {
+        $read_more = ' <a class="read-more" href="'. esc_url( get_permalink() ) . '">' . sprintf(__( 'Read full text &rarr;', 'rpcblank' ), get_the_title() ) . '</a>';
+        $rpcblank_excerpt .= $read_more;
+    }
+
+    return apply_filters( 'rpcblank_html_excerpt', $rpcblank_excerpt, $raw_excerpt );
 }
 
 /* ========== TAGS ========== */
@@ -360,16 +402,6 @@ function rpcblank_comments_number( $count ) {
     } else {
         return $count;
     }
-}
-
-/* ========== EXCERPT ========== */
-
-// Customize the read more link
-add_filter('excerpt_more', 'rpcblank_read_more');
-
-function rpcblank_read_more( $more ) {
-    global $post;
-    return '&hellip; <a class="read-more" title="See full text" href="' . get_permalink( $post->ID ) . '"> &rarr;</a>';
 }
 
 /* ========== SEARCH ========== */
