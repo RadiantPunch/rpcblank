@@ -79,6 +79,10 @@ function rpcblank_format_style_html( $html, $handle, $href, $media ) {
     return '<link rel="stylesheet" id="' . $handle . '" href="' . $href . '" media="' . $media . '" />' . "\n";
 }
 
+// Remove mediaelement css
+wp_dequeue_style('wp-mediaelement');
+wp_deregister_style('wp-mediaelement');
+
 /* ----- JavaScript ----- */
 
 // Enqueue theme scripts
@@ -140,6 +144,10 @@ function rpcblank_format_script_html( $tag, $handle, $src ) {
             'jquery-migrate',
             'admin-bar',
             'comment-reply',
+            'mediaelement-core',
+            'mediaelement-migrate',
+            'wp-mediaelement',
+            'wp-embed',
             'share',
             'navigation',
         );
@@ -452,17 +460,17 @@ function rpcblank_remove_tinymce_emoji( $plugins ) {
 /* ----- Media Element ----- */
 
 // Remove default CSS and JavaScript WordPress adds to audio shortcode
-add_action( 'wp_print_scripts', 'no_mediaelement_scripts', 100 );
-add_filter('wp_video_shortcode_library','no_mediaelement');
+// add_action( 'wp_print_scripts', 'no_mediaelement_scripts', 100 );
+// add_filter( 'wp_video_shortcode_library','no_mediaelement' );
 
-function no_mediaelement_scripts() {
-    wp_dequeue_script( 'wp-mediaelement' );
-    wp_deregister_script( 'wp-mediaelement' );
-}
+// function no_mediaelement_scripts() {
+//     wp_dequeue_script( 'wp-mediaelement' );
+//     wp_deregister_script( 'wp-mediaelement' );
+// }
 
-function no_mediaelement() {
-    return '';
-}
+// function no_mediaelement() {
+//     return '';
+// }
 
 /* ----- Recent Comments CSS ----- */
 
