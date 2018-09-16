@@ -8,7 +8,9 @@
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
-<?php do_action( 'after_body_open_tag' ); ?>
+	<noscript class="site-noscript"><?php _e( 'You have JavaScript disabled. Some features may not work as expected.', 'rpcblank' ); ?></noscript>
+    <noscript class="gtag"><iframe src="https://www.googletagmanager.com/ns.html?id=<?php rpcblank_gtagmanager_container_code() ?>"></iframe></noscript>
+
 	<!-- Site Header -->
 	<header class="site-header">
 
