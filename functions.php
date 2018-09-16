@@ -1,23 +1,12 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-/* ========== THEME SETUP ========== */
+/*
+---------------------------------------------------------------------------
+THEME SETUP
+---------------------------------------------------------------------------
+*/
 
-// Set content width value based on the theme's design
-if ( ! isset( $content_width ) ) $content_width = 1200;
-
-// Register Theme Features
-function rpcblank_setup() {
-
-    // Add theme support for Automatic Feed Links
-    add_theme_support( 'automatic-feed-links' );
-
-    // Add theme support for Post Formats
-    add_theme_support( 'post-formats', array( 'status', 'quote', 'gallery', 'image', 'video', 'audio', 'link', 'aside', 'chat' ) );
-
-    // Add theme support for Featured Images
-    add_theme_support( 'post-thumbnails' );
-
-    // Add theme support for Custom Header
+function rpcblank_theme_setup() {
     $header_args = array(
         'default-image'          => '',
         'width'                  => 0,
@@ -35,179 +24,146 @@ function rpcblank_setup() {
         'video-active-callback'  => '',
     );
     add_theme_support( 'custom-header', $header_args );
-
-    // Add theme support for HTML5 Semantic Markup
+    add_theme_support( 'automatic-feed-links' );
+    add_theme_support( 'post-formats', array( 'status', 'quote', 'gallery', 'image', 'video', 'audio', 'link', 'aside', 'chat' ) );
+    add_theme_support( 'post-thumbnails' );
     add_theme_support( 'html5', array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption' ) );
-
-    // Add theme support for document Title tag
     add_theme_support( 'title-tag' );
 
-    // Add theme support for Translation
+    if ( ! isset( $content_width ) ) $content_width = 1200;
+    
     load_theme_textdomain( 'rpcblank', get_template_directory() . '/language' );
-
-    // Register menus
-    register_nav_menu( 'main-menu', __( 'Main Menu', 'rpcblank' ) );
 }
 
-add_action( 'after_setup_theme', 'rpcblank_setup' );
+add_action( 'after_setup_theme', 'rpcblank_theme_setup' );
 
-/* ========== STYLES & SCRIPTS ========== */
 
-/* ----- CSS ----- */
+/*
+---------------------------------------------------------------------------
+STYLESHEETS
+---------------------------------------------------------------------------
+*/
 
-// Enqueue theme styles
-add_action( 'wp_enqueue_scripts', 'rpcblank_styles' );
+// --- Add theme styles ---
 
-function rpcblank_styles() {
+function rpcblank_add_css() {
     wp_enqueue_style( 'rpcblank', get_template_directory_uri() . '/style.css', '' );
     wp_enqueue_style( 'tablet', get_template_directory_uri() . '/assets/css/tablet.css', 'rpcblank' );
     wp_enqueue_style( 'desktop', get_template_directory_uri() . '/assets/css/desktop.css', 'rpcblank' );
     wp_enqueue_style( 'print', get_template_directory_uri() . '/assets/css/print.css', 'rpcblank', false, 'print' );
 }
 
-// Add editor stylesheet
-add_action('init', 'rpcblank_editor_style');
-
-function rpcblank_editor_style() {
+function rpcblank_add_editor_css() {
     add_editor_style( 'editor', get_template_directory_uri() . '/assets/css/editor.css' );
 }
 
-// Format style HTML
-add_filter( 'style_loader_tag', 'rpcblank_format_style_html', 10, 4 );
+add_action( 'wp_enqueue_scripts', 'rpcblank_add_css' );
+add_action( 'init', 'rpcblank_add_editor_css' );
 
-function rpcblank_format_style_html( $html, $handle, $href, $media ) {
+// --- Format HTML links to stylesheets ---
+
+function rpcblank_format_css_html_in_head( $html, $handle, $href, $media ) {
     return '<link rel="stylesheet" id="' . $handle . '" href="' . $href . '" media="' . $media . '" />' . "\n";
 }
 
-// Remove mediaelement css
-wp_dequeue_style('wp-mediaelement');
-wp_deregister_style('wp-mediaelement');
+add_filter( 'style_loader_tag', 'rpcblank_format_css_html_in_head', 10, 4 );
 
-/* ----- JavaScript ----- */
+// --- Remove unnecessary WP default styles ---
 
-// Enqueue theme scripts
-add_action( 'wp_enqueue_scripts', 'rpcblank_scripts' );
+function rpcblank_remove_wp_default_styles() {
+    wp_dequeue_style('wp-mediaelement');
+    wp_deregister_style('wp-mediaelement');
+}
 
-function rpcblank_scripts() {
-    // Load social sharing script on posts only
-    if ( is_single() ) {
-        wp_register_script( 'share', get_template_directory_uri() . '/assets/js/share.js', false, '', false );
-        wp_enqueue_script( 'share' );
-    }
-    // Load button toggle script for navigation
-    wp_register_script( 'navigation', get_template_directory_uri() . '/assets/js/navigation.js', false, '', false );
+add_action( 'wp_print_styles', 'rpcblank_remove_wp_default_styles' );
+
+
+/*
+---------------------------------------------------------------------------
+SCRIPTS
+---------------------------------------------------------------------------
+*/
+
+// --- Add theme scripts ---
+
+function rpcblank_add_scripts() {
+    wp_register_script( 'share', get_template_directory_uri() . '/assets/js/share.js', false, '', false );
+    wp_register_script( 'navigation', get_template_directory_uri() . '/assets/js/navigation.js', false, '', false );   
     wp_enqueue_script( 'navigation' );
-}
-
-// Enqueue comment reply script
-add_action( 'comment_form_before', 'rpcblank_comment_reply_script' );
-
-function rpcblank_comment_reply_script() {
-    if ( get_option( 'thread_comments' ) ) { 
-        wp_enqueue_script( 'comment-reply' ); 
+    if ( is_single() ) {
+        wp_enqueue_script( 'share' );
+        if ( comments_open() && get_option( 'thread_comments' ) ) {
+            wp_enqueue_script( 'comment-reply' ); 
+        }
     }
 }
 
-// Add Google Tag Manager
-add_action( 'wp_head', 'rpcblank_gtag_manager', 2);
- 
-function rpcblank_gtag_manager() { ?>
+add_action( 'wp_enqueue_scripts', 'rpcblank_add_scripts' );
 
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){ w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','CONTAINER-CODE');</script>
-<!-- End Google Tag Manager -->
-
-<?php
-}
-
-add_action( 'after_body_open_tag', 'rpcblank_gtag_noscript' );
-
-function rpcblank_gtag_noscript() { ?>
-
-    <!-- Google Tag Manager (noscript) -->
-    <noscript class="gtag"><iframe src="https://www.googletagmanager.com/ns.html?id=CONTAINER-CODE"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
-<?php
-}
-
-// Format script HTML and add defer
-add_filter( 'script_loader_tag', 'rpcblank_format_script_html', 10, 3 );
+// --- Format HTML links to scripts, defer & async ---
 
 function rpcblank_format_script_html( $tag, $handle, $src ) {
-    if ( ! is_admin() ) {
-        $defer_scripts = array( 
-            'jquery-migrate',
-            'admin-bar',
-            'comment-reply',
-            'mediaelement-core',
-            'mediaelement-migrate',
-            'wp-mediaelement',
-            'wp-embed',
-            'share',
-            'navigation',
-        );
-        $defer = '';
-
-        if ( in_array( $handle, $defer_scripts ) ) {
-            $defer = ' defer="defer"';
-        }
-
-        return '<script src="' . $src . '"' . $defer . '></script>' . "\n";
-        
-    } else {
-        return $tag;
+    $defer_scripts = array( 
+        'backbone',
+        'comment-reply',
+        'jquery-migrate',
+        'mediaelement-core',
+        'mediaelement-migrate',
+        'mediaelement-vimeo',
+        'navigation',
+        'share',
+        'underscore',
+        'wp-embed',
+        'wp-mediaelement',
+        'wp-playlist',
+        'wp-util'
+    );
+    if ( in_array( $handle, $defer_scripts ) ) {
+        $defer = ' defer="defer"';
     }
-
+    return '<script src="' . $src . '"' . $defer . '></script>' . "\n";
 }
 
-/* ========== SITE BRANDING ========== */
+add_filter( 'script_loader_tag', 'rpcblank_format_script_html', 10, 3 );
 
-// Get just the logo so that image, site title, and site description can all be wrapped in one anchor for accessibility
-function rpcblank_logo() {
-    $custom_logo_id = get_theme_mod( 'custom_logo' );
-    $image = wp_get_attachment_image( $custom_logo_id , 'full', '', ["class" => "site-logo"] );
-    echo $image;
+// --- Add Google Tag Manger script ---
+
+function rpcblank_gtagmanager_container_code() {
+    return 'CONTAINER-CODE';
 }
 
-// Markup site branding based on post type
-function rpcblank_site_branding() {
-    $tag = 'span';
-    $class = 'site-title';
-    $title = esc_html( get_bloginfo( 'name' ) );
-    
-    $description = esc_html( bloginfo( 'description' ) );
-    $site_description = '';
-    $site_title = '';
-    $site_logo = '';
-
-    if ( is_front_page() ) {
-        $tag = 'h1';
-    }
-
-    if ( has_custom_logo() ) {
-        $site_logo = rpcblank_logo();
-    }
-
-    if ( get_bloginfo( 'description' ) ) {
-        $site_description = '<span class="site-description">' . $description . '</span>';
-    }
-
-    if ( get_bloginfo( 'name' ) ) {
-        $site_title = '<' . $tag . ' class="' . $class . '">' . $title . '</' . $tag . '>';
-    }
-
-    $site_branding = $site_logo . $site_title . $site_description;
-    echo $site_branding;
+function rpcblank_add_gtagmanager_script() {
+    $container = rpcblank_gtagmanager_container_code();
+    ?><!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){ w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','<?php $container ?>');</script>
+    <!-- End Google Tag Manager --><?php
 }
 
-/* ========== NAVIGATION ========== */
+add_action( 'wp_head', 'rpcblank_add_gtagmanager_script', 2 );
 
-// Main menu
+
+/*
+---------------------------------------------------------------------------
+NAVIGATION
+---------------------------------------------------------------------------
+*/
+
+// --- Register theme navigation menus --- //
+
+function rpcblank_register_nav_menus() {
+    register_nav_menus( array(
+        'main-menu' => 'Main Menu',
+    ) );
+}
+
+add_action( 'init', 'rpcblank_register_nav_menus' );
+
+// --- Create menus to be called in templates
+
 function rpcblank_main_menu() {
     wp_nav_menu( array(
         'menu'  =>  'main-menu',
@@ -225,22 +181,20 @@ function rpcblank_main_menu() {
     ) );
 }
 
-// Remove menu ids
-add_filter('nav_menu_item_id', 'rpcblank_remove_menu_ids', 100, 1);
+// --- Filter menu ids and classes, keeping only those that are needed
 
-function rpcblank_remove_menu_ids( $ids ) {
+function rpcblank_remove_menu_item_ids( $ids ) {
     return is_array( $ids ) ? array() : '';
 }
 
-// Remove all menu classes except for those desired
-add_filter('nav_menu_css_class', 'rpcblank_selective_menu_classes', 10, 2);
-
-function rpcblank_selective_menu_classes($classes, $item) {
+function rpcblank_filter_menu_classes( $classes, $item ) {
     $classes = array_filter( 
         $classes, 
         function( $class ) { 
-            return in_array( $class, 
-            array( 'current-menu-item', 'menu-item-has-children' ) );
+            return in_array( $class, array( 
+                'current-menu-item', 
+                'menu-item-has-children'
+            ) );
         }
     );
     array_merge(
@@ -250,9 +204,15 @@ function rpcblank_selective_menu_classes($classes, $item) {
     return array_map( 'trim', $classes );
 }
 
-/* ========== WIDGET AREAS ========== */
+add_filter( 'nav_menu_item_id', 'rpcblank_remove_menu_item_ids', 100, 1 );
+add_filter( 'nav_menu_css_class', 'rpcblank_filter_menu_classes', 10, 2 );
 
-add_action( 'widgets_init', 'rpcblank_widgets_init' );
+
+/*
+---------------------------------------------------------------------------
+WIDGETS
+---------------------------------------------------------------------------
+*/
 
 function rpcblank_widgets_init() {
     register_sidebar( array (
@@ -263,27 +223,88 @@ function rpcblank_widgets_init() {
         'before_title' => '<h2 class="widget-title">',
         'after_title' => '</h2>',
     ) );
+
+    // Remove recent comments styles
+    global $wp_widget_factory;
+    remove_action( 'wp_head', array( $wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style' ) );
 }
 
-/* ========== PAGE & POSTS ========== */
+add_action( 'widgets_init', 'rpcblank_widgets_init' );
 
-// If no title is present for the current post, display an arrow
-add_filter( 'the_title', 'rpcblank_title' );
+// --- Tag cloud widget ---
 
-function rpcblank_title( $title ) {
-    if ( $title == '' ) {
-        return '&rarr;';
-    } else {
-        return $title;
+function rpcblank_tag_cloud_limit($args){
+    if(isset($args['taxonomy']) && $args['taxonomy'] == 'post_tag'){
+        $args['number'] = 5;
     }
+    return $args;
 }
 
-/* ----- Body classes ----- */
+function rpcblank_remove_inline_tag_cloud_styles( $tag_string ){
+  return preg_replace( '/style=("|\')(.*?)("|\')/', '', $tag_string );
+}
 
-// Remove all body classes except for those listed
-add_filter( 'body_class', 'rpc_blank_remove_body_classes', 10, 3 );
+add_filter( 'widget_tag_cloud_args', 'rpcblank_tag_cloud_limit' );
+add_filter( 'wp_generate_tag_cloud', 'rpcblank_remove_inline_tag_cloud_styles', 10, 1 );
 
-function rpc_blank_remove_body_classes( $classes, $extra_classes ) {
+
+/*
+---------------------------------------------------------------------------
+SITE BRANDING
+---------------------------------------------------------------------------
+*/
+
+// --- Display the logo without link ---
+
+function rpcblank_get_logo() {
+    $custom_logo_id = get_theme_mod( 'custom_logo' );
+    $image = wp_get_attachment_image( $custom_logo_id , 'full', '', ["class" => "site-logo"] );
+    return $image;
+}
+
+// --- Site branding HTML ---
+
+function rpcblank_site_branding() {
+    $tag = 'span';
+    $class = 'site-title';
+    $title = esc_html( get_bloginfo( 'name' ) );
+    
+    $description = esc_html( bloginfo( 'description' ) );
+    $site_description = '';
+    $site_title = '';
+    $site_logo = '';
+
+    if ( is_front_page() ) {
+        $tag = 'h1';
+    }
+
+    if ( has_custom_logo() ) {
+        $site_logo = rpcblank_get_logo();
+    }
+
+    if ( get_bloginfo( 'description' ) ) {
+        $site_description = '<span class="site-description">' . $description . '</span>';
+    }
+
+    if ( get_bloginfo( 'name' ) ) {
+        $site_title = '<' . $tag . ' class="' . $class . '">' . $title . '</' . $tag . '>';
+    }
+
+    $site_branding = $site_logo . $site_title . $site_description;
+    echo $site_branding;
+}
+
+
+/*
+---------------------------------------------------------------------------
+PAGES & POSTS
+---------------------------------------------------------------------------
+*/
+
+
+// --- Filter body classes ---
+
+function rpcblank_filter_body_classes( $classes, $extra_classes ) {
     $whitelist = array(
         'home',
         'page',
@@ -311,22 +332,47 @@ function rpc_blank_remove_body_classes( $classes, $extra_classes ) {
     return array_merge( $classes, (array) $extra_classes );
 }
 
-// Remove all post classes except for those listed
-add_filter( 'post_class', 'rpc_blank_remove_post_classes', 10, 3 );
+add_filter( 'body_class', 'rpcblank_filter_body_classes', 10, 3 );
 
-function rpc_blank_remove_post_classes( $classes, $extra_classes ) {
-    $whitelist = array( 'post', 'hentry', 'format-aside', 'format-audio', 'format-chat', 'format-gallery', 'format-link', 'format-image', 'format-quote', 'format-status', 'format-video' );
+// --- Filter post classes ---
+
+function rpcblank_filter_post_classes( $classes, $extra_classes ) {
+    $whitelist = array( 
+        'post',
+        'hentry',
+        'format-aside',
+        'format-audio',
+        'format-chat',
+        'format-gallery',
+        'format-link',
+        'format-image',
+        'format-quote',
+        'format-status',
+        'format-video'
+    );
 
     $classes = array_intersect( $classes, $whitelist );
 
     return array_merge( $classes, (array) $extra_classes );
 }
 
-/* ----- Post Excerpts ----- */
+add_filter( 'post_class', 'rpcblank_filter_post_classes', 10, 3 );
 
-// Allow HTML in excerpts
+// --- If the title is empty for the current post, display an arrow
+
+function rpcblank_title( $title ) {
+    if ( $title == '' ) {
+        return '&rarr;';
+    } else {
+        return $title;
+    }
+}
+
+add_filter( 'the_title', 'rpcblank_title' );
+
+// --- Create HTML Excerpts ---
+
 remove_filter( 'get_the_excerpt', 'wp_trim_excerpt' );
-add_filter( 'get_the_excerpt', 'rpcblank_html_excerpt' );
 
 function rpcblank_html_excerpt( $rpcblank_excerpt ) {
     $allowed = '<a>,<abbr>,<address>,<audio>,<bdi>,<bdo>,<blockquote>,<br>,<caption>,<cite>,<code>,<col>,<colgroup>,<dd>,<del>,<details>,<dfn>,<div>,<dl>,<dt>,<em>,<embed>,<figcaption>,<figure>,<footer>,<h3>,<h4>,<h5>,<h6>,<hr>,<iframe>,<img>,<ins>,<kbd>,<li>,<mark>,<meter>,<object>,<ol>,<p>,<pre>,<progress>,<q>,<rp>,<rt>,<ruby>,<samp>,<script>,<span>,<strong>,<summary>,<table>,<tbody>,<td>,<tfoot>,<th>,<thead>,<time>,<tr>,<track>,<ul>,<var>,<video>,<wbr>';
@@ -347,7 +393,7 @@ function rpcblank_html_excerpt( $rpcblank_excerpt ) {
         $count = 0;
 
         // Divide the string into tokens; HTML tags, or words, followed by any whitespace
-        preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $rpcblank_excerpt, $tokens);
+        preg_match_all( '/(<[^>]+>|[^<>\s]+)\s*/u', $rpcblank_excerpt, $tokens );
         foreach ( $tokens[0] as $token ) { 
             if ( $count >= $excerpt_length && preg_match( '/[\;\?\.\!]\s*/uS', $token ) ) { 
                 // Limit reached, continue until , ; ? . or ! occur at the end
@@ -375,32 +421,14 @@ function rpcblank_html_excerpt( $rpcblank_excerpt ) {
     return apply_filters( 'rpcblank_html_excerpt', $rpcblank_excerpt, $raw_excerpt );
 }
 
-/* ========== TAGS ========== */
+add_filter( 'get_the_excerpt', 'rpcblank_html_excerpt' );
 
-// Limit number of tags in tag cloud
-add_filter('widget_tag_cloud_args', 'rpcblank_tag_cloud_limit');
 
-function rpcblank_tag_cloud_limit($args){
-    if(isset($args['taxonomy']) && $args['taxonomy'] == 'post_tag'){
-        $args['number'] = 5;
-    }
-    return $args;
-}
-
-add_filter('wp_generate_tag_cloud', 'rpcblank_generate_tag_cloud', 10, 1);
-
-function rpcblank_generate_tag_cloud($tag_string){
-  return preg_replace('/style=("|\')(.*?)("|\')/','',$tag_string);
-}
-
-/* ========== COMMENTS ========== */
-
-function rpcblank_pings( $comment ){
-    $GLOBALS['comment'] = $comment; ?>
-    <li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>"><?php echo comment_author_link(); ?></li><?php 
-}
-
-add_filter( 'get_comments_number', 'rpcblank_comments_number' );
+/*
+---------------------------------------------------------------------------
+COMMENTS
+---------------------------------------------------------------------------
+*/
 
 function rpcblank_comments_number( $count ) {
     if ( ! is_admin() ) {
@@ -412,9 +440,22 @@ function rpcblank_comments_number( $count ) {
     }
 }
 
-/* ========== SEARCH ========== */
+function rpcblank_pings( $comment ){
+    $GLOBALS['comment'] = $comment; ?>
+    <li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>"><?php echo comment_author_link(); ?></li><?php 
+}
 
-function rpcblank_highlight_search_term( $data ) {
+add_filter( 'get_comments_number', 'rpcblank_comments_number' );
+
+
+/*
+---------------------------------------------------------------------------
+SEARCH
+---------------------------------------------------------------------------
+*/
+
+// --- Highlight keyphrases in search results ---
+function rpcblank_search_keyphrase_highlight( $data ) {
     $function = call_user_func( 'get_the_' . $data );
     $keys = implode( '|', explode( ' ', get_search_query() ) );
     $function = preg_replace('/(' . $keys .')/iu', '<mark>\0</mark>', $function);
@@ -422,16 +463,24 @@ function rpcblank_highlight_search_term( $data ) {
     echo $function;
 }
 
-/* ========== CLEANUP UNNECESSARY DEFAULTS ========== */
 
-/* ----- Emoji ----- */
+/*
+---------------------------------------------------------------------------
+CLEANUP DEFAULTS
+---------------------------------------------------------------------------
+*/
 
-// Disable all emoji support
-add_action( 'init', 'rpcblank_remove_wp_emoji' );
+// --- Remove emoji support ---
 
-function rpcblank_remove_wp_emoji() {
+function rpcblank_remove_tinymce_emoji_support( $plugins ) {
+    if ( is_array( $plugins ) ) {
+        return array_diff( $plugins, array( 'wpemoji' ) );
+    } else {
+        return array();
+    }
+}
 
-    // Remove all actions related to emojis
+function rpcblank_remove_wp_emoji_support() {
     remove_action( 'admin_print_styles', 'print_emoji_styles' );
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
@@ -440,60 +489,31 @@ function rpcblank_remove_wp_emoji() {
     remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
     remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
 
-    // Remove TinyMCE emoji support
-    add_filter( 'tiny_mce_plugins', 'rpcblank_remove_tinymce_emoji' );
-
-    // Remove emoji DNS prefetch
+    add_filter( 'tiny_mce_plugins', 'rpcblank_remove_tinymce_emoji_support' );
     add_filter( 'emoji_svg_url', '__return_false' );
 
 }
 
-// Remove TinyMCE emoji support
-function rpcblank_remove_tinymce_emoji( $plugins ) {
-    if ( is_array( $plugins ) ) {
-        return array_diff( $plugins, array( 'wpemoji' ) );
-    } else {
-        return array();
-    }
-}
+add_action( 'init', 'rpcblank_remove_wp_emoji_support' );
 
-/* ----- Media Element ----- */
 
-// Remove default CSS and JavaScript WordPress adds to audio shortcode
-// add_action( 'wp_print_scripts', 'no_mediaelement_scripts', 100 );
-// add_filter( 'wp_video_shortcode_library','no_mediaelement' );
+/*
+---------------------------------------------------------------------------
+PLUGIN CUSTOMIZATIONS
+---------------------------------------------------------------------------
+*/
 
-// function no_mediaelement_scripts() {
-//     wp_dequeue_script( 'wp-mediaelement' );
-//     wp_deregister_script( 'wp-mediaelement' );
-// }
+// --- ACF Content Analysis for Yoast SEO ---
 
-// function no_mediaelement() {
-//     return '';
-// }
-
-/* ----- Recent Comments CSS ----- */
-
-// Remove recent comments style
-add_action('widgets_init', 'rpcblank_remove_recent_comments_style');
-
-function rpcblank_remove_recent_comments_style() {
-    global $wp_widget_factory;
-    remove_action('wp_head', array($wp_widget_factory->widgets['WP_Widget_Recent_Comments'], 'recent_comments_style'));
-}
-
-/* ========== PLUGIN CUSTOMIZATIONS ========== */
-
-/* ----- ACF Content Analysis for Yoast SEO ----- */
-
-// Tell Yoast SEO which custom fields are headings
-add_filter( 'yoast-acf-analysis/headlines', function ( $headlines ) {
-    /* Example
-    $headlines['field_000000000'] = 2; */
+function rpcblank_analyze_acf_fields_as_headings( $headlines ) {
+    // $headlines['field_000000000'] = 2;
     return $headlines;
-});
+}
 
-/* ----- Advanced Custom Fields ----- */
+add_filter( 'yoast-acf-analysis/headlines', 'rpcblank_analyze_acf_fields_as_headings' );
+
+// --- Advanced Custom Fields ---
+
 function rpcblank_sanitize_acf_text_field( $text ) {
     $allowed = array(
         'abbr' => array(
@@ -573,7 +593,14 @@ function rpcblank_acf_button( $prefix, $link_type, $button_class ) {
     return $button;
 }
 
-/* ----- Gravity Forms ----- */
+// --- Gravity Forms ---
 
 // Disable IP address logging
 add_filter( 'gform_ip_address', '__return_empty_string' );
+
+// Immediately delete submissions from DB (replace number with form id)
+function rpcblank_gform_remove_form_entry( $entry ) {
+    GFAPI::delete_entry( $entry['id'] );
+}
+
+add_action( 'gform_after_submission_1', 'rpcblank_gform_remove_form_entry' );
