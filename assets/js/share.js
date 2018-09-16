@@ -17,22 +17,22 @@
             var pageUrl = encodeURIComponent(document.URL);
             var tweet = encodeURIComponent($('meta[property="og:description"]').attr('content'));
             
-            $('.social-share.facebook').on('click', function() {
+            $('.social-share .facebook').on('click', function() {
                 url = 'https://www.facebook.com/sharer.php?u=' + pageUrl;
                 socialWindow(url);
             });
 
-            $('.social-share.twitter').on('click', function() {
+            $('.social-share .twitter').on('click', function() {
                 url = 'https://twitter.com/intent/tweet?url=' + pageUrl + '&text=' + tweet;
                 socialWindow(url);
             });
 
-            $('.social-share.linkedin').on('click', function() {
+            $('.social-share .linkedin').on('click', function() {
                 url = 'https://www.linkedin.com/shareArticle?mini=true&url=' + pageUrl;
                 socialWindow(url);
             })
 
-            $('.social-share.google-plus').on('click', function() {
+            $('.social-share .google-plus').on('click', function() {
                 url = 'https://plus.google.com/share?url=' + pageUrl;
                 socialWindow(url);
             })
