@@ -29,13 +29,19 @@ function rpcblank_theme_setup() {
     add_theme_support( 'post-thumbnails' );
     add_theme_support( 'html5', array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption' ) );
     add_theme_support( 'title-tag' );
+    add_theme_support( 'admin-bar', array( 'callback' => '__return_false' ) );
 
     if ( ! isset( $content_width ) ) $content_width = 1200;
     
     load_theme_textdomain( 'rpcblank', get_template_directory() . '/language' );
 }
 
+function rpcblank_remove_admin_bar_inline_print_css() {
+    remove_action('wp_head', 'wp_admin_bar_header');
+}
+
 add_action( 'after_setup_theme', 'rpcblank_theme_setup' );
+add_action( 'admin_bar_init', 'rpcblank_remove_admin_bar_inline_print_css' );
 
 
 /*
@@ -210,6 +216,41 @@ add_filter( 'nav_menu_css_class', 'rpcblank_filter_menu_classes', 10, 2 );
 
 /*
 ---------------------------------------------------------------------------
+CONTENT FILTERS
+---------------------------------------------------------------------------
+*/
+function rpcblank_remove_attribs( $content ) {
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->LoadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED );
+    libxml_use_internal_errors(false);
+    $xpath = new DOMXPath( $dom );    
+    
+    $elements = $xpath->query( "//*[@width or @height or @style]|//iframe[@frameborder]" );
+    foreach ( $elements as $el ) {
+        if ( $el->hasAttribute( 'width' ) ) {
+            $el->removeAttribute( 'width' );
+        };
+        if ( $el->hasAttribute( 'height' ) ) {
+            $el->removeAttribute( 'height' );
+        };
+        if ( $el->hasAttribute( 'style' ) ) {
+            $el->removeAttribute( 'style' );
+        };
+        if ( $el->hasAttribute( 'frameborder' ) ) {
+            $el->removeAttribute( 'frameborder' );
+        };
+    }
+    $dom->encoding = 'UTF-8';
+    return $dom->saveHTML();
+ }
+
+add_filter( 'the_content', 'rpcblank_remove_attribs', 15 );
+add_filter( 'post_thumbnail_html', 'rpcblank_remove_attribs', 14 );
+
+
+/*
+---------------------------------------------------------------------------
 WIDGETS
 ---------------------------------------------------------------------------
 */
@@ -231,6 +272,15 @@ function rpcblank_widgets_init() {
 
 add_action( 'widgets_init', 'rpcblank_widgets_init' );
 
+function rpcblank_widget_filter( $widget_area ) {
+    if ( is_active_sidebar( $widget_area ) ) {
+        ob_start();
+        dynamic_sidebar( $widget_area );
+        $widget_output = ob_get_clean();
+        echo rpcblank_remove_attribs( $widget_output );
+    }
+}
+
 // --- Tag cloud widget ---
 
 function rpcblank_tag_cloud_limit($args){
@@ -240,12 +290,7 @@ function rpcblank_tag_cloud_limit($args){
     return $args;
 }
 
-function rpcblank_remove_inline_tag_cloud_styles( $tag_string ){
-  return preg_replace( '/style=("|\')(.*?)("|\')/', '', $tag_string );
-}
-
 add_filter( 'widget_tag_cloud_args', 'rpcblank_tag_cloud_limit' );
-add_filter( 'wp_generate_tag_cloud', 'rpcblank_remove_inline_tag_cloud_styles', 10, 1 );
 
 
 /*
