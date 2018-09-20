@@ -12,6 +12,20 @@ Text Domain: rpcblank;
 
 /* ========== NORMALIZE ========== */
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+*:focus {
+    outline: none;
+}
+
+body {
+    line-height: 1;
+}
+
 article,
 aside,
 details,
@@ -23,98 +37,262 @@ hgroup,
 menu,
 nav,
 section {
-    display: block
+    display: block;
 }
 
-blockquote, body, dl, dd, h1, h2, h3, h4, h5, h6, hr, p, ul {
-    margin: 0;
+blockquote,
+body,
+dd,
+dl,
+fieldset,
+figure,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+input,
+ol,
+p,
+pre,
+ul,
+textarea {
+    margin:  0;
 }
 
-input, ul, option, select, textarea {
+button,
+dialog,
+fieldset,
+input,
+legend,
+ol,
+td,
+textarea,
+th,
+ul {
     padding: 0;
 }
 
-iframe, input, select, textarea {
+button,
+dialog,
+fieldset,
+hr,
+iframe,
+input,
+select,
+textarea {
     border: none;
 }
 
-input, select {
-    font-family: inherit;
+/*button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: none;
+}*/
+
+address,
+b,
+button,
+cite,
+code,
+datalist,
+dfn,
+em,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+i,
+input,
+kbd,
+optgroup,
+pre,
+samp,
+select,
+small,
+strong,
+sub,
+sup,
+textarea,
+th,
+u,
+var {
+    font: inherit;
 }
 
-h1, h2, h3, h4, h5, h6, input, select {
-    font-size: inherit;    
+a,
+acronym,
+abbr,
+del,
+ins {
+    text-decoration: inherit;
 }
 
-h1, h2, h3, h4, h5, h6, strong {
-    font-weight: inherit;
-}
-
-dfn, em {
-    font-style: normal;
-}
-
-body {
-    line-height: 1;
-}
-
-a, select, input::placeholder {
+a,
+dialog,
+mark,
+button:disabled,
+input:disabled,
+optgroup:disabled,
+option:disabled,
+textarea:disabled,
+a:visited {
     color: inherit;
 }
 
-a, abbr[title] {
-    text-decoration: none;
+button,
+dialog,
+input,
+mark,
+select,
+textarea,
+::selection {
+    background: none;
 }
 
+meter,
+progress,
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="color"] {
+    width: auto;
+}
+
+meter,
+progress,
+input[type="color"] {
+    height: auto;
+}
+
+ol,
 ul {
     list-style: none;
 }
 
-input, mark, select {
-    background-color: transparent;
+pre {
+    white-space: pre-wrap;
 }
 
-a:focus, input:focus, select:focus, summary:focus, textarea:focus {
-    outline: none;
+q {
+    quotes: none;
 }
 
-blockquote:before, blockquote:after,
-q:before, q:after {
-    content: none;
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow-wrap: break-word;
+    vertical-align: middle;
+}
+
+thead,
+tbody,
+tfoot,
+table > tr,
+td,
+th {
+    vertical-align: inherit;
+}
+
+meter,
+progress {
+    vertical-align: bottom;
+}
+
+input:disabled,
+textarea:disabled {
+    opacity: 1;
+}
+
+input[type="checkbox"],
+input[type="file"],
+input[type="radio"] {
+    opacity: 0;
+}
+
+summary {
+    display: flex;
+    flex-direction: column;
 }
 
 summary::-webkit-details-marker {
     display: none;
 }
 
-iframe, select, textarea {
-    width: 100%;
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
-option {
-    min-height: unset;
+::placeholder {
+   color: inherit;
+   opacity: 1;
+   text-indent: 0;
 }
 
-table {
-    border-collapse: collapse;
-    border-spacing: 0
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-year-field { 
+    color: inherit; 
+}
+
+::-webkit-inner-spin-button,
+::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}
+
+::-moz-focus-inner {
+    border: none;
+    outline: none;
+}
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: none;
+}
+
+:not(output):-moz-ui-invalid {
+    box-shadow: none;
 }
 
 /* ========== ACCESSIBILITY ========== */
 
 .screen-reader-text {
+    border: 0;
     clip: rect(1px, 1px, 1px, 1px);
-    position: absolute !important;
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    word-wrap: normal;
 }
 
 /* ========== BASIC TYPOGRAPHY ========== */
 
-/* ========== MEDIA ========== */
+/* ========== MEDIA & EMBEDS ========== */
 
-img {
+audio,
+img,
+video,
+iframe {
     max-width: 100%;
     height: auto;
+    display: block;
+    margin: 0 auto;
+    clear: both;
 }
+
+/*
 
 .sticky {}
 
@@ -126,11 +304,7 @@ img {
 
 .gallery-caption {}
 
-.alignright {}
-
-.alignleft {}
-
-.aligncenter {}
+.aligncenter {}*/
 
 /* ========== MISCELLANEOUS ========== */
 

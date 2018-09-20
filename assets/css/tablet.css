@@ -1,0 +1,23 @@
+/* ========== MEDIA & EMBEDS ========== */
+
+@media screen and ( min-width: 600px ) {
+	
+	.alignright,
+	.alignleft {
+		display: inline-block;
+		max-width: 50vw;
+	}
+
+	.alignright {
+		float: right;
+	}
+
+	.alignleft {
+		float: left;
+	}
+
+	.alignnone {
+		margin: 0;
+	}
+
+}

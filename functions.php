@@ -74,15 +74,6 @@ function rpcblank_format_css_html_in_head( $html, $handle, $href, $media ) {
 
 add_filter( 'style_loader_tag', 'rpcblank_format_css_html_in_head', 10, 4 );
 
-// --- Remove unnecessary WP default styles ---
-
-function rpcblank_remove_wp_default_styles() {
-    wp_dequeue_style('wp-mediaelement');
-    wp_deregister_style('wp-mediaelement');
-}
-
-add_action( 'wp_print_styles', 'rpcblank_remove_wp_default_styles' );
-
 
 /*
 ---------------------------------------------------------------------------
@@ -94,7 +85,7 @@ SCRIPTS
 
 function rpcblank_add_scripts() {
     wp_register_script( 'share', get_template_directory_uri() . '/assets/js/share.js', false, '', false );
-    wp_register_script( 'navigation', get_template_directory_uri() . '/assets/js/navigation.js', false, '', false );   
+    wp_register_script( 'navigation', get_template_directory_uri() . '/assets/js/navigation.js', array( 'jquery' ), '', false );   
     wp_enqueue_script( 'navigation' );
     if ( is_single() ) {
         wp_enqueue_script( 'share' );
@@ -110,9 +101,9 @@ add_action( 'wp_enqueue_scripts', 'rpcblank_add_scripts' );
 
 function rpcblank_format_script_html( $tag, $handle, $src ) {
     $defer_scripts = array( 
+        'jquery-migrate',
         'backbone',
         'comment-reply',
-        'jquery-migrate',
         'mediaelement-core',
         'mediaelement-migrate',
         'mediaelement-vimeo',
@@ -220,6 +211,9 @@ CONTENT FILTERS
 ---------------------------------------------------------------------------
 */
 function rpcblank_remove_attribs( $content ) {
+    if ( empty( $content ) ) {
+        return;
+    }
     $dom = new DOMDocument();
     libxml_use_internal_errors(true);
     $dom->LoadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED );
@@ -245,8 +239,8 @@ function rpcblank_remove_attribs( $content ) {
     return $dom->saveHTML();
  }
 
-add_filter( 'the_content', 'rpcblank_remove_attribs', 15 );
 add_filter( 'post_thumbnail_html', 'rpcblank_remove_attribs', 14 );
+add_filter( 'the_content', 'rpcblank_remove_attribs', 15 );
 
 
 /*
